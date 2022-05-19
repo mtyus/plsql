@@ -1,0 +1,118 @@
+-- Table product_master.
+CREATE TABLE product_master 
+(productid    NUMBER,
+ product_name VARCHAR2(100),
+ unit_price   NUMBER(9,2),
+ modified_dte DATE);
+
+-- Table product_changes.
+CREATE TABLE product_changes 
+(productid    NUMBER,
+ product_name VARCHAR2(100),
+ unit_price   NUMBER(9,2),
+ status       VARCHAR2(20));
+
+-- Table products_discontinued.
+CREATE TABLE products_discontinued 
+(productid    NUMBER,
+ product_name VARCHAR2(100),
+ unit_price   NUMBER(9,2),
+ disc_dte     DATE);
+
+-- Trigger product_master_before_delete.
+CREATE OR REPLACE TRIGGER product_master_before_delete 
+BEFORE DELETE ON product_master FOR EACH ROW
+
+BEGIN
+
+ INSERT INTO products_discontinued
+ VALUES (:old.productid,:old.product_name,:old.unit_price,SYSDATE);
+
+END;
+/
+
+-- Procedure merge_products_proc.
+-- This procedure uses the MERGE statement to make inserts, updates and
+-- deletes to a product_master table based on the product_changes table.
+-- Also, discontinued product records are inserted into the products_discontinued
+-- table via the product_master_before_delete trigger. 
+CREATE OR REPLACE PROCEDURE merge_products_proc IS
+
+ discontinued_status CONSTANT VARCHAR2(20) := 'DISCONTINUED';
+
+BEGIN
+
+ MERGE INTO product_master PM
+ USING product_changes PC
+ ON (PM.productid = PC.productid)
+ WHEN MATCHED THEN
+  UPDATE SET PM.product_name = PC.product_name,
+             PM.unit_price = PC.unit_price,
+             PM.modified_dte = SYSDATE
+  DELETE WHERE PC.status = discontinued_status
+ WHEN NOT MATCHED THEN
+  INSERT VALUES (PC.productid,PC.product_name,PC.unit_price,NULL); 
+
+END;
+/
+
+-- Insert data into table product_master.
+INSERT INTO product_master VALUES(123,'Dill Pickles',3.99,NULL);
+INSERT INTO product_master VALUES(323,'Lentil Beans (Organic)',3.99,NULL);
+INSERT INTO product_master VALUES(434,'Wild Blueberries (Organic)',8.99,NULL);
+INSERT INTO product_master VALUES(535,'Sea Salt Crackers',3.99,NULL);
+COMMIT;
+
+-- Insert data into table product_changes.
+INSERT INTO product_changes VALUES(891,'Taco Shells',3.99,NULL);
+INSERT INTO product_changes VALUES(323,'Lentil Beans',2.99,NULL);
+INSERT INTO product_changes VALUES(434,'Wild Blueberries (Organic)',8.99,'DISCONTINUED');
+COMMIT;
+
+-- Execute procedure merge_products_proc.
+EXECUTE merge_products_proc();
+
+SELECT * FROM product_master;
+
+SELECT * FROM products_discontinued;
+
+-- Oracle Live SQL Results
+
+Table created.
+
+Table created.
+
+Table created.
+
+Trigger created.
+
+Procedure created.
+
+1 row(s) inserted.
+
+1 row(s) inserted.
+
+1 row(s) inserted.
+
+1 row(s) inserted.
+
+Statement processed.
+
+1 row(s) inserted.
+
+1 row(s) inserted.
+
+1 row(s) inserted.
+
+Statement processed.
+
+Statement processed.
+
+PRODUCTID   PRODUCT_NAME        UNIT_PRICE  MODIFIED_DTE
+123         Dill Pickles        3.99        - 
+323         Lentil Beans        2.99        19-MAY-22
+535         Sea Salt Crackers   3.99        - 
+891         Taco Shells         3.99        - 
+
+PRODUCTID   PRODUCT_NAME                UNIT_PRICE  DISC_DTE
+434         Wild Blueberries (Organic)  8.99        19-MAY-22
