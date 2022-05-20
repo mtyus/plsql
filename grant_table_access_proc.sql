@@ -1,3 +1,8 @@
+-- The procedure grant_table_access_proc grants table access to a list of users.
+-- A use case for this procedure is a Data migration project where you have
+-- numerous source, driver, cross reference, etc. tables in a conversion schema
+-- that Developers need access to.
+
 -- Table dm_users.
 CREATE TABLE dm_users
 (userid VARCHAR2(10));
@@ -6,10 +11,6 @@ CREATE TABLE dm_users
 CREATE TABLE dm_tables
 (table_name VARCHAR2(100));
 
--- Procedure grant_table_access_proc.
--- This procedure grants table access to a list of users.
--- Use cases: Data migration projects where you have numerous source,
--- driver, cross reference, etc. tables in your conversion schema.
 CREATE OR REPLACE PROCEDURE grant_table_access_proc IS
 
  CURSOR c_tables IS
