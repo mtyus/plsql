@@ -1,3 +1,6 @@
+-- The procedure bulk_collect_proc performs a bulk collect and uses the limit
+-- clause to manage the impact to PGA (process global area) memory.
+
 -- Table customer_transactions.
 CREATE TABLE customer_transactions 
 (customerid    VARCHAR2(10),
@@ -12,8 +15,6 @@ CREATE TABLE processed_transactions
  trans_amt  NUMBER(9,2),
  audit_flg  VARCHAR2(1));
 
--- Procedure bulk_collect_proc.
--- This procedure performs a bulk collect with a limit to manage the impact to PGA (process global area) memory.
 CREATE OR REPLACE PROCEDURE bulk_collect_proc IS
 
  CURSOR c_trans(p_audit_amt NUMBER) IS 
