@@ -1,3 +1,8 @@
+-- The procedure merge_products_proc uses the MERGE statement to make inserts, updates and
+-- deletes to a product_master table based on the product_changes table.
+-- Also, discontinued product records are inserted into the products_discontinued
+-- table via the product_master_before_delete trigger.
+
 -- Table product_master.
 CREATE TABLE product_master 
 (productid    NUMBER,
@@ -31,11 +36,6 @@ BEGIN
 END;
 /
 
--- Procedure merge_products_proc.
--- This procedure uses the MERGE statement to make inserts, updates and
--- deletes to a product_master table based on the product_changes table.
--- Also, discontinued product records are inserted into the products_discontinued
--- table via the product_master_before_delete trigger. 
 CREATE OR REPLACE PROCEDURE merge_products_proc IS
 
  discontinued_status CONSTANT VARCHAR2(20) := 'DISCONTINUED';
