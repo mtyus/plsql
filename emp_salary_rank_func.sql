@@ -1,8 +1,7 @@
--- Function emp_salary_rank_func.
--- This function returns salary rank data based on the p_rank value i.e. if
--- p_rank is '3' it returns the 1st, 2nd and 3rd salary rank data.
--- Note: I used the DENSE_RANK function because the DENSE function
--- can cause gaps in the ranking. 
+-- The function emp_salary_rank_func returns salary rank data based on the p_rank value i.e. if
+-- p_rank is '3' it returns the 1st, 2nd and 3rd salary rank data. The DENSE_RANK function was
+-- used because the DENSE function can cause gaps in the ranking.
+
 CREATE OR REPLACE FUNCTION emp_salary_rank_func(p_rank IN NUMBER) 
 RETURN SYS_REFCURSOR IS
 
